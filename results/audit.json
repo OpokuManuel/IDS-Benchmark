@@ -1,0 +1,78 @@
+{
+ "cleaning": {
+  "rows_raw": 257673,
+  "rows_official_train": 175341,
+  "rows_official_test": 82332,
+  "unique_vectors": 153684,
+  "exact_duplicate_rows_removed": 103989,
+  "vectors_binary_conflict": 414,
+  "rows_in_binary_conflict": 1758,
+  "vectors_category_conflict_only": 2031,
+  "rows_in_category_conflict": 40400,
+  "rows_clean": 153270,
+  "clean_class_counts": {
+   "Normal": 85308,
+   "Exploits": 26670,
+   "Fuzzers": 18760,
+   "Reconnaissance": 8424,
+   "Generic": 7284,
+   "DoS": 4405,
+   "Shellcode": 1447,
+   "Analysis": 456,
+   "Backdoor": 357,
+   "Worms": 159
+  }
+ },
+ "dns_share_train_by_class": {
+  "Generic": 0.8271,
+  "Normal": 0.1584,
+  "Fuzzers": 0.0076,
+  "Exploits": 0.0039,
+  "DoS": 0.0023,
+  "Reconnaissance": 0.0007
+ },
+ "udp_dns_rows_train": 47249,
+ "classes_official_train": {
+  "Normal": 56000,
+  "Generic": 40000,
+  "Exploits": 33393,
+  "Fuzzers": 18184,
+  "DoS": 12264,
+  "Reconnaissance": 10491,
+  "Analysis": 2000,
+  "Backdoor": 1746,
+  "Shellcode": 1133,
+  "Worms": 130
+ },
+ "classes_official_test": {
+  "Normal": 37000,
+  "Generic": 18871,
+  "Exploits": 11132,
+  "Fuzzers": 6062,
+  "DoS": 4089,
+  "Reconnaissance": 3496,
+  "Analysis": 677,
+  "Backdoor": 583,
+  "Shellcode": 378,
+  "Worms": 44
+ },
+ "official_test_rows_with_exact_twin_in_train": 8541,
+ "official_test_rows": 82332,
+ "official_train_duplicate_rows": 74301,
+ "official_test_duplicate_rows": 28386,
+ "groups_bins1": {
+  "n_groups": 1491,
+  "largest": 10255,
+  "singletons": 448
+ },
+ "groups_bins2": {
+  "n_groups": 2754,
+  "largest": 10255,
+  "singletons": 948
+ },
+ "groups_bins4": {
+  "n_groups": 4996,
+  "largest": 10255,
+  "singletons": 2091
+ }
+}

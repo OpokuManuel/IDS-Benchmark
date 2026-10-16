@@ -1,0 +1,74 @@
+[
+ {
+  "model": "logreg",
+  "config": "C=0.1",
+  "val_macro_f1": 0.2497,
+  "val_acc": 0.6265,
+  "val_auc": 0.9785,
+  "secs": 14
+ },
+ {
+  "model": "logreg",
+  "config": "C=1",
+  "val_macro_f1": 0.2695,
+  "val_acc": 0.6315,
+  "val_auc": 0.9797,
+  "secs": 19
+ },
+ {
+  "model": "logreg",
+  "config": "C=10",
+  "val_macro_f1": 0.2797,
+  "val_acc": 0.6335,
+  "val_auc": 0.9793,
+  "secs": 19
+ },
+ {
+  "model": "random_forest",
+  "config": "n=100,leaf=1",
+  "val_macro_f1": 0.3051,
+  "val_acc": 0.6814,
+  "val_auc": 0.9812,
+  "secs": 19
+ },
+ {
+  "model": "random_forest",
+  "config": "n=100,leaf=3",
+  "val_macro_f1": 0.2697,
+  "val_acc": 0.6757,
+  "val_auc": 0.9831,
+  "secs": 18
+ },
+ {
+  "model": "random_forest",
+  "config": "n=100,leaf=1,bal",
+  "val_macro_f1": 0.2864,
+  "val_acc": 0.6816,
+  "val_auc": 0.9862,
+  "secs": 19
+ },
+ {
+  "model": "grad_boosting",
+  "config": "it=100,lr=.1",
+  "val_macro_f1": 0.2646,
+  "val_acc": 0.6516,
+  "val_auc": 0.9727,
+  "secs": 40
+ },
+ {
+  "model": "grad_boosting",
+  "config": "it=300,lr=.1",
+  "val_macro_f1": 0.2411,
+  "val_acc": 0.6151,
+  "val_auc": 0.7877,
+  "secs": 111
+ },
+ {
+  "model": "grad_boosting",
+  "config": "it=300,lr=.05,leaf15,l2=1",
+  "val_macro_f1": 0.2835,
+  "val_acc": 0.6717,
+  "val_auc": 0.9879,
+  "secs": 105
+ }
+]

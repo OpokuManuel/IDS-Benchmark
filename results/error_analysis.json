@@ -1,0 +1,91 @@
+{
+ "best_model": "grad_boosting",
+ "top_confusions": [
+  [
+   "Fuzzers",
+   "Normal",
+   6655,
+   0.35474413646055436
+  ],
+  [
+   "Generic",
+   "Fuzzers",
+   5917,
+   0.8123283909939594
+  ],
+  [
+   "Normal",
+   "Fuzzers",
+   4854,
+   0.056899704599803064
+  ],
+  [
+   "DoS",
+   "Exploits",
+   2822,
+   0.6406356413166856
+  ],
+  [
+   "Reconnaissance",
+   "Normal",
+   2505,
+   0.29736467236467234
+  ],
+  [
+   "Normal",
+   "Exploits",
+   2329,
+   0.02730107375627139
+  ],
+  [
+   "Reconnaissance",
+   "Exploits",
+   1925,
+   0.22851377018043684
+  ],
+  [
+   "Reconnaissance",
+   "Shellcode",
+   1778,
+   0.21106362773029438
+  ]
+ ],
+ "errors_by_true_class": {
+  "Normal": 8621,
+  "Fuzzers": 7542,
+  "Reconnaissance": 7154,
+  "Generic": 6754,
+  "DoS": 3324,
+  "Exploits": 2455,
+  "Shellcode": 677,
+  "Analysis": 312,
+  "Backdoor": 251,
+  "Worms": 95
+ },
+ "n_errors": 37185,
+ "n_test": 153270,
+ "missed_attacks_by_class_at_tpr95": {
+  "Analysis": 0.024,
+  "Backdoor": 0.003,
+  "DoS": 0.003,
+  "Exploits": 0.007,
+  "Fuzzers": 0.158,
+  "Generic": 0.002,
+  "Reconnaissance": 0.022,
+  "Shellcode": 0.017
+ },
+ "false_alarm_rate_by_service": {
+  "-": 0.2,
+  "dns": 0.002,
+  "ftp": 0.299,
+  "ftp-data": 0.001,
+  "http": 0.366,
+  "smtp": 0.005,
+  "ssh": 0.007
+ },
+ "false_alarm_share_top_service": {
+  "-": 0.744,
+  "http": 0.214,
+  "ftp": 0.038
+ }
+}
