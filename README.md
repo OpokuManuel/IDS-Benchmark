@@ -1,6 +1,6 @@
 # Leakage-safe ML intrusion-detection benchmark (UNSW-NB15)
 
-**Author:** Opoku Emmanuel Atta · **Status:** results reproduced from the code in this repo · **Python 3.12**
+**Author:** Emmanuel Atta Opoku · **Status:** results reproduced from the code in this repo · **Python 3.12**
 
 **Question.** How much do standard evaluation practices overstate the performance of ML intrusion detectors,
 and which of the errors that remain are fixable by better models versus caused by the data itself?
@@ -47,32 +47,32 @@ Sensitivity to the grouping granularity (1 / 2 / 4 size-bins per octave) is repo
 
 **Models** (fixed after a small sweep on an *inner validation split of one training fold*, never test data: `scripts/00_tune_on_validation.py`, `results/tuning_inner_validation.json`):
 logistic regression (C=10), random forest (100 trees), histogram gradient boosting (300 rounds, lr 0.05, 15 leaves, L2=1).
-Features: all numeric columns (log1p) + one-hot proto/service/state. All seeds fixed (42).
+Features: all numeric columns (log1p) + one-hot proto/service/state. Seeds are fixed (42, plus 43 and 44 for the repeats of the grouped protocol).
 
 **Metrics.** Per-class precision/recall, macro-F1, binary ROC/PR-AUC (score = 1 - P(Normal)), FPR at 95% and 99% detection, and
 an *honest operating point*: the threshold for 95% detection is chosen on a validation split carved from the **training** fold, then measured on test.
 
-## 3. Results (pooled out-of-fold predictions; every flow is tested once)
+## 3. Results (pooled out-of-fold predictions; every flow is tested once; P2 rows are means over three grouping seeds)
 
 | Protocol | Model | Accuracy | Macro-F1 | ROC-AUC | FPR @ 95% det. | FPR @ 99% det. |
 |---|---|---|---|---|---|---|
-| P0 official | Logistic reg. | 0.730 | 0.373 | 0.969 | 0.229 | 0.380 |
+| P0 official | Logistic reg. | 0.730 | 0.374 | 0.969 | 0.230 | 0.382 |
 | P0 official | Random forest | 0.758 | 0.473 | 0.980 | 0.132 | 0.305 |
 | P0 official | Grad. boosting | 0.767 | 0.511 | 0.983 | 0.134 | 0.317 |
-| P1 random | Logistic reg. | 0.809 | 0.484 | 0.966 | 0.191 | 0.264 |
+| P1 random | Logistic reg. | 0.810 | 0.483 | 0.966 | 0.190 | 0.264 |
 | P1 random | Random forest | 0.872 | 0.663 | 0.981 | 0.127 | 0.229 |
 | P1 random | Grad. boosting | 0.871 | 0.697 | 0.982 | 0.124 | 0.224 |
-| **P2 grouped** | Logistic reg. | 0.633 | 0.256 | 0.856 | 0.371 | 0.431 |
-| **P2 grouped** | Random forest | 0.745 | 0.377 | 0.955 | 0.223 | 0.351 |
-| **P2 grouped** | Grad. boosting | 0.757 | 0.429 | 0.962 | 0.179 | 0.261 |
+| **P2 grouped** | Logistic reg. | 0.634 | 0.259 | 0.841 | 0.370 | 0.431 |
+| **P2 grouped** | Random forest | 0.745 | 0.374 | 0.955 | 0.223 | 0.377 |
+| **P2 grouped** | Grad. boosting | 0.758 | 0.429 | 0.964 | 0.177 | 0.259 |
 
 Full table with PR-AUC and validation-chosen thresholds: `results/summary_by_protocol.csv`. Fold-to-fold spread under P2 (macro-F1 sd about 0.025;
 AUC ranges 0.91-0.99 for the tree models and **0.59-0.96 for logistic regression**) is large: treat differences smaller than about 0.05 macro-F1 as noise.
 
 **Reading it honestly.**
 * The official split (P0) does **not** simply "inflate" scores: it scores *below* the cleaned random split because the official partitions also have their own distribution shift. Its problem is that it mixes leakage (duplicates) with shift, so you cannot tell which is driving the number.
-* Moving from a random to a grouped split costs gradient boosting 0.27 macro-F1 and 0.06 FPR at 95% detection. The ranking of models is stable (GB > RF > LR) across all three protocols and all grouping granularities (`fig6`).
-* The honest operating point at a nominal 95% detection target gave 95.3% detection at **19.4%** FPR for gradient boosting under P2 (`val_thr_*` columns): a false-alarm rate that is not deployable on its own.
+* Moving from a random to a grouped split costs gradient boosting 0.27 macro-F1 and 0.05 FPR at 95% detection. The ranking of models is stable (GB > RF > LR) across all three protocols and all grouping granularities (`fig6`).
+* The honest operating point at a nominal 95% detection target gave 94.9% detection at **18.6%** FPR for gradient boosting under P2 (mean over three seeds) (`val_thr_*` columns): a false-alarm rate that is not deployable on its own.
 
 **Per-class (P2, gradient boosting; `results/per_class_metrics.csv`).** Strong: Normal (R 0.90, P 0.88), Exploits (R 0.91, P 0.73). Weak: **Generic recall 0.07**,
 Reconnaissance 0.15, DoS 0.25, Analysis P 0.12 / R 0.32. Under P0 the same classes score far higher (Generic R 0.97, Reconnaissance R 0.81), which is the leakage-and-duplication effect.
@@ -87,13 +87,13 @@ Reconnaissance 0.15, DoS 0.25, Analysis P 0.12 / R 0.32. Under P0 the same class
   The DoS->Exploits confusion matches the label-conflict finding (flow features alone often cannot separate them), so it is largely a data ceiling, not a model defect.
 * **Missed attacks** (at an oracle 95%-detection threshold): almost all misses are Fuzzers (15.8% of Fuzzers missed; every other class under 3%).
 * **False alarms:** the false-alarm rate on benign flows is 37% for HTTP, 30% for FTP and 20% for flows with no identified service, versus 0.2% for DNS; 74% of all false alarms come from benign flows with no identified service.
-* **Shortcut evidence (verified for logistic regression, fold 0):** 93% of UDP/DNS flows in the official training file are "Generic" attacks, and when a 10,255-flow benign DNS cluster was held out, logistic regression labelled 10,250 of them Exploits. The random forest ablation shows that removing the categorical columns alone does not fix tree models, so the shortcut they use is carried by other features (the TTL ablation points there). I have not run a deeper attribution analysis.
-* The low Generic recall under P2 is *consistent with* Generic being 88% duplicates (its distinct patterns are few, so holding out a group removes whole patterns), but I did not test that explanation directly.
+* **Shortcut evidence (verified for logistic regression, fold 0):** 83% of UDP/DNS flows in the official training file are "Generic" attacks and 84% are attacks of any kind. The results are reproducible with `scripts/04_dns_shortcut_check.py`. The random forest ablation shows that removing the categorical columns alone does not fix tree models, so the shortcut they use is carried by other features (the TTL ablation points there). I have not run a deeper attribution analysis.
+* The low Generic recall under P2 is *consistent with* Generic being 87% duplicates (its distinct patterns are few, so holding out a group removes whole patterns), but I did not test that explanation directly.
 
 ## 5. Limitations (please read)
 
 1. **No true temporal or session split** (the files have no timestamps/IPs). P2 is a near-duplicate-group proxy. Next step: repeat with CIC-IDS2017, which has timestamps, and split by day/time.
-2. **One grouping seed.** All P2 numbers use fold assignment seed 42; I did not complete repeats with other seeds (`scripts/02_run_experiments.py --stage seeds` is provided but its results are not in this report). Fold-level spread is reported instead.
+2. **Three grouping seeds.** The P2 results in the main table are means over fold-assignment seeds 42, 43 and 44 (each pooled over five folds); the spread across seeds is in the `*_sd` columns of `results/summary_by_protocol.csv`. P0, P1, the ablation and the sensitivity analysis, and the per-class tables, confusion matrix and ROC curves, use seed 42 only.
 3. **Group definition is a heuristic**, chosen by measured leakage (`fig2`), not an oracle for "same attack session".
 4. **Label resolution** (majority category for conflicting vectors) is a judgement call that shrinks rare classes.
 5. **Hyper-parameters** were tuned on one inner validation split only; baselines are deliberately simple.
@@ -112,7 +112,7 @@ python scripts/02_run_experiments.py --stage main   # P0/P1/P2               (~3
 python scripts/02_run_experiments.py --stage ablation
 python scripts/02_run_experiments.py --stage sensitivity
 python scripts/03_make_report_assets.py  # tables + figures
-python report/build_report.py --author "Your Name"   # 2-page PDF
+python report/build_report.py --author "Opoku Emanuel Atta"   # 2-page PDF
 pytest -q                                # 11 tests guarding the leakage claims
 ```
 Runs are resumable and deterministic given the pinned versions (`requirements.txt`).

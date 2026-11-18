@@ -1,4 +1,4 @@
-"""Build the 2-page PDF write-up from results/. Usage: python report/build_report.py --author "Your Name" """
+"""Build the 2-page PDF write-up from results/. Usage: python report/build_report.py --author "Emmanuel Atta Opoku" """
 import argparse, sys
 from pathlib import Path
 import pandas as pd
@@ -10,7 +10,7 @@ from reportlab.platypus import Image, KeepTogether, Paragraph, SimpleDocTemplate
 
 #File paths
 ROOT = Path(__file__).resolve().parents[1]; RES = ROOT / "results"; FIG = RES / "figures"
-ap = argparse.ArgumentParser(); ap.add_argument("--author", default="Opoku Emmanuel Atta"); args = ap.parse_args()
+ap = argparse.ArgumentParser(); ap.add_argument("--author", default="Emmanuel Atta Opoku"); args = ap.parse_args()
 
 #Loading CSV
 S = pd.read_csv(RES / "summary_by_protocol.csv").set_index(["protocol", "model"])
@@ -70,22 +70,21 @@ st = [P("How much do standard evaluations overstate ML intrusion detection? A le
       KeepTogether([img("fig2_leakage_audit.png", 118*mm), P("Figure 1. Share of test flows with a near-twin in training (left) and median nearest-neighbour distance (right). Grouping removes almost all near-duplicate leakage.", C)]),
       P("3. Results", H),
       tab,
-      P("Table 1. Macro-F1 / FPR at 95% detection (pooled out-of-fold predictions, seed 42). Fold-to-fold macro-F1 sd under P2 is about 0.025.", C),
+      P("Table 1. Macro-F1 / FPR at 95% detection (pooled out-of-fold predictions; P2 rows are means over three seeds). Fold-to-fold macro-F1 sd under P2 is about 0.025.", C),
       img("fig1_protocol_comparison.png", 172*mm),
       P("Figure 2. The leakage-safe protocol (P2) is lowest for every model. The official split (P0) is <i>not</i> simply inflated relative to P1: it also carries its own distribution shift. Model ranking is stable across protocols.", C),
       P(f"With the transferred threshold, gradient boosting under P2 detects {g('P2_grouped','grad_boosting','val_thr_tpr')*100:.1f}% of attacks at a {g('P2_grouped','grad_boosting','val_thr_fpr')*100:.1f}% false-positive rate, too noisy to deploy alone. "
-        "Per class (gradient boosting, P2), Normal (recall 0.90) and Exploits (0.91) are strong, while Generic (0.07), Reconnaissance (0.15) and DoS (0.25) collapse, although they score 0.97, 0.81 and 0.08 under P0. "
+        "Per class (gradient boosting, P2), Normal (recall 0.90) and Exploits (0.91) are strong, while Generic (0.07) and Reconnaissance (0.15) collapse, although they score 0.97 and 0.81 under the official split (which uses different cleaning); DoS is weak in both (0.08 official, 0.25 grouped). "
         "Stricter grouping lowers scores monotonically (gradient boosting macro-F1 0.46, 0.43, 0.40 at 4, 2 and 1 size-bins per octave). "
         "Removing TTL features from the random forest raises FPR at 95% detection from 0.22 to 0.37; removing TCP sequence numbers or protocol/service/state changes it little.", B),
       P("4. Error analysis", H),
       P("81% of Generic is predicted as Fuzzers and 64% of DoS as Exploits; the latter matches the label-conflict finding, so part of this error is a data ceiling for flow-level features. "
         "At 95% detection nearly all missed attacks are Fuzzers (15.8% missed; every other class under 3%). False alarms concentrate on benign flows with no identified service (74% of all false alarms; "
-        "37% of benign HTTP flows are flagged versus 0.2% of DNS). A spurious correlation is visible directly: 93% of UDP/DNS flows in the official training file are attacks, and logistic regression, "
-        "when a 10,255-flow benign DNS cluster was held out, labelled 10,250 of those flows Exploits. This is the spurious-correlation pitfall described by Arp et al. (2022).", B),
+        "37% of benign HTTP flows are flagged versus 0.2% of DNS). A possible shortcut is visible in the data: 84% of UDP/DNS flows in the official training file are attacks (83% Generic), so a model can learn that DNS means attack. This is the spurious-correlation pitfall described by Arp et al. (2022).", B),
       KeepTogether([Table([[img("fig4_confusion_P2_best.png", 80*mm), img("fig6_sensitivity.png", 92*mm)]], colWidths=[84*mm, 94*mm]),
         P("Figure 3. Left: gradient boosting confusion matrix under P2 (row-normalised %). Right: scores fall as near-duplicate grouping gets stricter (sensitivity analysis).", C)]),
       P("5. Limitations", H),
-      P("No true temporal or session split was possible with these files; grouping is a heuristic proxy. All P2 numbers use one fold-assignment seed (fold-level spread is reported instead; AUC ranges 0.59-0.96 for logistic regression). "
+      P("No true temporal or session split was possible with these files; grouping is a heuristic proxy. The P2 results are means over three fold-assignment seeds; the AUC of logistic regression varies widely between folds (0.59 to 0.96). "
         "Majority-category resolution of conflicting vectors shrinks rare classes. Baselines are deliberately simple and lightly tuned. "
         "Next step: repeat with CIC-IDS2017 and a genuine day/time split.", B),
       P("<b>References.</b> Moustafa &amp; Slay (2015), UNSW-NB15, MilCIS. Arp et al. (2022), Dos and Don'ts of ML in Computer Security, USENIX Security. "

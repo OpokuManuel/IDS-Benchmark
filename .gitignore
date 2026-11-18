@@ -4,3 +4,4 @@ __pycache__/
 .pytest_cache/
 data/raw/*.csv
 results/superseded/
+results/raw_backup/
